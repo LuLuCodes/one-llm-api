@@ -73,6 +73,10 @@ export class ChatDTO {
   readonly maxTokens?: number;
 
   @IsOptional()
-  @IsString({ message: 'modelName必须是字符串' })
+  @IsString({ message: 'systemPrompt必须是字符串' })
   readonly systemPrompt?: string;
+
+  @IsOptional()
+  @IsString({ message: 'imageBase64必须是字符串' })
+  readonly imageBase64?: string;
 }

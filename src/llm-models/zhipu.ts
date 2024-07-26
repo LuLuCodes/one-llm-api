@@ -24,7 +24,7 @@ export class ZhipuAI extends ChatModel {
   async invoke({
     temperature = 0.95,
     topP = 0.7,
-    maxTokens = 2048,
+    maxTokens = 1024,
     messages,
   }: {
     temperature?: number;
@@ -47,7 +47,7 @@ export class ZhipuAI extends ChatModel {
   async stream({
     temperature = 0.95,
     topP = 0.7,
-    maxTokens = 2048,
+    maxTokens = 1024,
     messages,
   }: {
     temperature?: number;

@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 10:06:03
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 15:57:13
+ * @LastEditTime: 2024-07-26 21:27:13
  * @FilePath: /one-llm-api/src/modules/llm/llm.service.ts
  * @Description:
  *
@@ -31,6 +31,7 @@ export class LlmService {
   async processBlockResponse({
     convertionId,
     systemPrompt,
+    imageBase64,
     userInput,
     modelType,
     modelName,
@@ -40,6 +41,7 @@ export class LlmService {
   }: {
     convertionId: string;
     systemPrompt?: string;
+    imageBase64?: string;
     userInput: string;
     modelType: string;
     modelName: string;
@@ -58,9 +60,22 @@ export class LlmService {
         return new HumanMessage({ ...message.kwargs });
       }
     });
+
     const messages =
       !convertionId && systemPrompt ? [new SystemMessage(systemPrompt)] : [];
-    const userMessage: HumanMessage = new HumanMessage(userInput);
+    const userMessage: HumanMessage = new HumanMessage({
+      content: imageBase64
+        ? [
+            { type: 'text', text: userInput },
+            {
+              type: 'image_url',
+              image_url: {
+                url: imageBase64,
+              },
+            },
+          ]
+        : [{ type: 'text', text: userInput }],
+    });
     messages.push(...histroyMessages, userMessage);
     const res = await model.invoke({
       temperature,
@@ -68,6 +83,7 @@ export class LlmService {
       maxTokens,
       messages,
     });
+
     const newConversionId = convertionId || uuid();
 
     await this.convertionStoreService.storeConversation({
@@ -85,6 +101,7 @@ export class LlmService {
   processStreamResponse({
     convertionId,
     systemPrompt,
+    imageBase64,
     userInput,
     modelType,
     modelName,
@@ -94,6 +111,7 @@ export class LlmService {
   }: {
     convertionId: string;
     systemPrompt?: string;
+    imageBase64?: string;
     userInput: string;
     modelType: string;
     modelName: string;
@@ -120,7 +138,14 @@ export class LlmService {
             !convertionId && systemPrompt
               ? [new SystemMessage(systemPrompt)]
               : [];
-          const userMessage: HumanMessage = new HumanMessage(userInput);
+          const userMessage: HumanMessage = new HumanMessage({
+            content: imageBase64
+              ? [
+                  { type: 'text', text: userInput },
+                  { type: 'image_url', image_url: imageBase64 },
+                ]
+              : [{ type: 'text', text: userInput }],
+          });
           messages.push(...histroyMessages, userMessage);
 
           const stream = await model.stream({

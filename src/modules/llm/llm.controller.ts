@@ -38,6 +38,7 @@ export class LlmController {
     return await this.llmService.processBlockResponse({
       convertionId,
       systemPrompt: body.systemPrompt,
+      imageBase64: body.imageBase64,
       userInput: body.userInput,
       modelType: body.modelType,
       modelName: body.modelName,
@@ -64,6 +65,7 @@ export class LlmController {
     const stream = this.llmService.processStreamResponse({
       convertionId,
       systemPrompt: body.systemPrompt,
+      imageBase64: body.imageBase64,
       userInput: body.userInput,
       modelType: body.modelType,
       modelName: body.modelName,
