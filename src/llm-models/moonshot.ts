@@ -13,10 +13,10 @@ import {
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
-import { ChatZhipuAI } from '@langchain/community/chat_models/zhipuai';
+import { ChatMoonshot } from '@langchain/community/chat_models/moonshot';
 import { ChatModel } from './base';
 
-export class ZhipuAI extends ChatModel {
+export class MoonshotAI extends ChatModel {
   constructor(apiKey: string, modelName: string) {
     super(apiKey, modelName);
   }
@@ -32,16 +32,16 @@ export class ZhipuAI extends ChatModel {
     maxTokens?: number;
     messages: (HumanMessage | AIMessage | SystemMessage)[];
   }) {
-    const glm = new ChatZhipuAI({
+    const moonshot = new ChatMoonshot({
       model: this.modelName,
       temperature,
       topP,
       maxTokens,
       streaming: false,
-      zhipuAIApiKey: this.apiKey,
+      apiKey: this.apiKey,
     });
 
-    return await glm.invoke(messages);
+    return await moonshot.invoke(messages);
   }
 
   async stream({
@@ -55,15 +55,15 @@ export class ZhipuAI extends ChatModel {
     maxTokens?: number;
     messages: (HumanMessage | AIMessage | SystemMessage)[];
   }) {
-    const glm = new ChatZhipuAI({
+    const moonshot = new ChatMoonshot({
       model: this.modelName,
       temperature,
       topP,
       maxTokens,
-      streaming: true,
-      zhipuAIApiKey: this.apiKey,
+      streaming: false,
+      apiKey: this.apiKey,
     });
 
-    return await glm.stream(messages);
+    return await moonshot.stream(messages);
   }
 }

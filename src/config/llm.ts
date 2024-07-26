@@ -13,4 +13,5 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('llm', () => ({
   zhipu_api_key: env('ZHIPU_API_KEY', ''),
+  moonshot_api_key: env('MOONSHOT_API_KEY', ''),
 }));

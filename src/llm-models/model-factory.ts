@@ -10,7 +10,8 @@
  */
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChatZhipu } from '@llm-models/zhipu';
+import { ZhipuAI } from '@llm-models/zhipu';
+import { MoonshotAI } from '@llm-models/moonshot';
 
 @Injectable()
 export class ModelFactory {
@@ -25,8 +26,13 @@ export class ModelFactory {
   }) {
     switch (modelType) {
       case 'zhipu':
-        return new ChatZhipu(
+        return new ZhipuAI(
           this.configService.get<string>('llm.zhipu_api_key'),
+          modelName,
+        );
+      case 'moonshot':
+        return new MoonshotAI(
+          this.configService.get<string>('llm.moonshot_api_key'),
           modelName,
         );
       default:

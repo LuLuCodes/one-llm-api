@@ -27,10 +27,10 @@ export class ChatDTO {
   @IsNotEmpty({ message: 'input是必填项' })
   readonly userInput: string;
 
-  // modelType必须是'zhipu'、'kimi'
+  // modelType必须是'zhipu'、'moonshot'
   @IsString({ message: 'modelType必须是字符串' })
   @IsNotEmpty({ message: 'modelType是必填项' })
-  @IsIn(['zhipu', 'kimi'], { message: 'modelType必须是zhipu或kimi' })
+  @IsIn(['zhipu', 'moonshot'], { message: 'modelType必须是zhipu或moonshot' })
   readonly modelType: string;
 
   @IsString({ message: 'modelName必须是字符串' })
