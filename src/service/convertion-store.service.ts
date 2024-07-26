@@ -49,7 +49,7 @@ export class ConvertionStoreService {
     messages: (HumanMessage | AIMessage)[];
   }) {
     // Set your messages in the store
-    // The key will be prefixed with `message:id:` and end
+    // The key will be prefixed with `convertion:id:` and end
     // with the index.
     await this.redisStore.mset(
       messages.map((message, index) => [

@@ -26,7 +26,7 @@ export class LlmService {
 
   async processBlockResponse({
     convertionId,
-    input,
+    userInput,
     modelType,
     modelName,
     temperature,
@@ -34,7 +34,7 @@ export class LlmService {
     maxTokens,
   }: {
     convertionId: string;
-    input: string;
+    userInput: string;
     modelType: string;
     modelName: string;
     temperature?: number;
@@ -52,16 +52,17 @@ export class LlmService {
         return new HumanMessage({ ...message.kwargs });
       }
     });
+    const userMessage: HumanMessage = new HumanMessage(userInput);
     const res = await model.invoke({
       temperature,
       topP,
       maxTokens,
-      messages: [...messages, new HumanMessage(input)],
+      messages: [...messages, userMessage],
     });
     const newConversionId = convertionId || uuid();
     const storeMessage: (HumanMessage | AIMessage)[] = [
       ...messages,
-      new HumanMessage(input),
+      userMessage,
       res,
     ];
 
@@ -78,7 +79,7 @@ export class LlmService {
 
   processStreamResponse({
     convertionId,
-    input,
+    userInput,
     modelType,
     modelName,
     temperature,
@@ -86,7 +87,7 @@ export class LlmService {
     maxTokens,
   }: {
     convertionId: string;
-    input: string;
+    userInput: string;
     modelType: string;
     modelName: string;
     temperature?: number;
@@ -107,11 +108,13 @@ export class LlmService {
               return new HumanMessage({ ...message.kwargs });
             }
           });
+
+          const userMessage: HumanMessage = new HumanMessage(userInput);
           const stream = await model.stream({
             temperature,
             topP,
             maxTokens,
-            messages: [...messages, new HumanMessage(input)],
+            messages: [...messages, userMessage],
           });
 
           const newConversionId = convertionId || uuid();
@@ -132,7 +135,7 @@ export class LlmService {
 
           const storeMessage: (HumanMessage | AIMessage)[] = [
             ...messages,
-            new HumanMessage(input),
+            userMessage,
             new AIMessage({ content: fullResponse, ...otherParms }),
           ];
 

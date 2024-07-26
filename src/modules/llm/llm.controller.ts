@@ -37,7 +37,7 @@ export class LlmController {
   ): Promise<any> {
     return await this.llmService.processBlockResponse({
       convertionId,
-      input: body.input,
+      userInput: body.userInput,
       modelType: body.modelType,
       modelName: body.modelName,
       temperature: body.temperature,
@@ -62,7 +62,7 @@ export class LlmController {
 
     const stream = this.llmService.processStreamResponse({
       convertionId,
-      input: body.input,
+      userInput: body.userInput,
       modelType: body.modelType,
       modelName: body.modelName,
       temperature: body.temperature,

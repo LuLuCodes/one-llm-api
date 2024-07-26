@@ -25,7 +25,7 @@ import {
 export class ChatDTO {
   @IsString({ message: 'input必须是字符串' })
   @IsNotEmpty({ message: 'input是必填项' })
-  readonly input: string;
+  readonly userInput: string;
 
   // modelType必须是'zhipu'、'kimi'
   @IsString({ message: 'modelType必须是字符串' })
@@ -71,4 +71,8 @@ export class ChatDTO {
   )
   @Min(1024, { message: 'topP必须大于等于1024' })
   readonly maxTokens?: number;
+
+  @IsOptional()
+  @IsString({ message: 'modelName必须是字符串' })
+  readonly systemPrompt?: string;
 }
