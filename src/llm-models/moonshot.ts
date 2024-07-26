@@ -22,8 +22,8 @@ export class MoonshotAI extends ChatModel {
   }
 
   async invoke({
-    temperature = 0.75,
-    topP = 0.7,
+    temperature = 0,
+    topP = 1,
     maxTokens = 2048,
     messages,
   }: {
@@ -45,8 +45,8 @@ export class MoonshotAI extends ChatModel {
   }
 
   async stream({
-    temperature = 0.75,
-    topP = 0.7,
+    temperature = 0,
+    topP = 1,
     maxTokens = 2048,
     messages,
   }: {
