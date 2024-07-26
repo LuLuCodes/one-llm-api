@@ -12,11 +12,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 import { RedisByteStore } from '@langchain/community/storage/ioredis';
-import {
-  AIMessage,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
 
 @Injectable()
 export class ConvertionStoreService {
