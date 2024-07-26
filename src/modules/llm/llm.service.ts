@@ -74,6 +74,7 @@ export class LlmService {
       convertionId: newConversionId,
       messages: [...messages, res],
     });
+    console.log([...messages, res]);
     return {
       convertionId: newConversionId,
       content: res.content,
