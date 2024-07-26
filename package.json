@@ -1,0 +1,154 @@
+{
+  "name": "one-llm-api",
+  "version": "1.0.0",
+  "description": "LLM API service based on NestJS and Langchain",
+  "author": "qian.qing@aliyun.com",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "bootstrap": "pnpm install",
+    "prebuild": "rimraf api",
+    "build": "rimraf api && nest build && shx cp ./src/.env.production ./api/.env",
+    "build:prod": "rimraf api && nest build && shx cp ./src/.env.production ./api/.env",
+    "build:pre-release": "rimraf api && nest build && shx cp ./src/.env.pre-release ./api/.env",
+    "build:test": "rimraf api && nest build && shx cp ./src/.env.test ./api/.env",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "rimraf api && cross-env NODE_ENV=development nest start --watch",
+    "start:debug": "rimraf api && cross-env NODE_ENV=development nest start --debug --watch",
+    "start:prod": "node api/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "cz": "git-cz",
+    "ncu": "ncu -u"
+  },
+  "dependencies": {
+    "@easy-front-core-sdk/kits": "^1.5.4",
+    "@langchain/community": "^0.2.20",
+    "@langchain/core": "^0.2.18",
+    "@nestjs/axios": "^3.0.2",
+    "@nestjs/common": "^10.3.5",
+    "@nestjs/config": "^3.2.1",
+    "@nestjs/core": "^10.3.5",
+    "@nestjs/mapped-types": "^2.0.5",
+    "@nestjs/platform-express": "^10.3.5",
+    "@nestjs/schedule": "^4.0.1",
+    "@nestjs/serve-static": "^4.0.1",
+    "bignumber.js": "^9.1.2",
+    "body-parser": "^1.20.2",
+    "body-parser-xml": "^2.0.5",
+    "chalk": "^4.1.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "commander": "^12.0.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cross-env": "^7.0.3",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fast-xml-parser": "^4.3.6",
+    "fs-extra": "^11.2.0",
+    "helmet": "^7.1.0",
+    "inquirer": "^9.2.16",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.2.11",
+    "lodash": "^4.17.21",
+    "log4js": "^6.9.1",
+    "minimist": "^1.2.8",
+    "multer": "1.4.5-lts.1",
+    "reflect-metadata": "^0.2.1",
+    "rimraf": "^5.0.5",
+    "rxjs": "^7.8.1",
+    "stacktrace-js": "^2.0.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "@nestjs/cli": "^10.3.2",
+    "@nestjs/schematics": "^10.1.1",
+    "@nestjs/testing": "^10.3.5",
+    "@swc/cli": "^0.3.10",
+    "@swc/core": "^1.4.8",
+    "@types/body-parser": "^1.19.5",
+    "@types/body-parser-xml": "^2.0.5",
+    "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.0",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.11.30",
+    "@types/supertest": "^6.0.2",
+    "@types/validator": "^13.11.9",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "commitizen": "^4.3.0",
+    "commitlint-config-cz": "^0.13.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "cz-customizable": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "shx": "^0.3.4",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^4.9.5",
+    "webpack": "^5.91.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "./",
+    "moduleNameMapper": {
+      "@config/(.*)": "<rootDir>/src/config/$1",
+      "@service/(.*)": "<rootDir>/src/service/$1",
+      "@libs/(.*)": "<rootDir>/src/libs/$1"
+    },
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "standard --fix",
+      "git add"
+    ]
+  }
+}
