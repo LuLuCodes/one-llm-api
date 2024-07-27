@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 10:06:03
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 21:27:13
+ * @LastEditTime: 2024-07-27 14:37:57
  * @FilePath: /one-llm-api/src/modules/llm/llm.service.ts
  * @Description:
  *
@@ -14,12 +14,14 @@ import {
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
+import { DocxLoader } from '@langchain/community/document_loaders/fs/docx';
 import { ModelFactory } from '@llm-models/model-factory';
 import { ChatModel } from '@llm-models/base';
 import { ConvertionStoreService } from '@service/convertion-store.service';
 import { Observable } from 'rxjs';
 
 import { uuid } from '@libs/cryptogram';
+import { getAbsolutePath } from '@libs/util';
 
 @Injectable()
 export class LlmService {
@@ -49,7 +51,10 @@ export class LlmService {
     topP?: number;
     maxTokens?: number;
   }): Promise<any> {
-    const model = this.modelFactory.createModel({ modelType, modelName });
+    const model: ChatModel = this.modelFactory.createModel({
+      modelType,
+      modelName,
+    });
     const retrievedMessages =
       await this.convertionStoreService.getConversation(convertionId);
     const histroyMessages = retrievedMessages.map((item) => {
@@ -90,7 +95,6 @@ export class LlmService {
       convertionId: newConversionId,
       messages: [...messages, res],
     });
-    console.log([...messages, res]);
     return {
       convertionId: newConversionId,
       content: res.content,
@@ -122,7 +126,10 @@ export class LlmService {
     return new Observable<string>((observer) => {
       (async () => {
         try {
-          const model = this.modelFactory.createModel({ modelType, modelName });
+          const model: ChatModel = this.modelFactory.createModel({
+            modelType,
+            modelName,
+          });
           const retrievedMessages =
             await this.convertionStoreService.getConversation(convertionId);
           const histroyMessages = retrievedMessages.map((item) => {
@@ -156,13 +163,10 @@ export class LlmService {
           });
 
           const newConversionId = convertionId || uuid();
-          let fullResponse = '';
-
-          let otherParms: any = {};
+          let finalChunk = null;
           for await (const chunk of stream) {
-            const { content, ...other } = chunk;
-            otherParms = { ...other };
-            fullResponse += content;
+            const { content } = chunk;
+            finalChunk = finalChunk ? finalChunk.concat(chunk) : chunk;
             observer.next(
               JSON.stringify({
                 convertionId: newConversionId,
@@ -173,10 +177,7 @@ export class LlmService {
 
           await this.convertionStoreService.storeConversation({
             convertionId: newConversionId,
-            messages: [
-              ...messages,
-              new AIMessage({ content: fullResponse, ...otherParms }),
-            ],
+            messages: [...messages, new AIMessage({ ...finalChunk })],
           });
           observer.complete();
         } catch (error) {
@@ -184,5 +185,17 @@ export class LlmService {
         }
       })();
     });
+  }
+
+  async fileLoader() {
+    // 根据相对路径获取文件绝对路径
+
+    const filePath = getAbsolutePath('../../20240711.docx');
+    console.log(filePath);
+    const loader = new DocxLoader(filePath);
+
+    const docs = await loader.load();
+
+    console.log(docs);
   }
 }

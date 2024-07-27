@@ -1,4 +1,5 @@
 import { ResponseCode } from '@config/global';
+import * as path from 'path';
 
 interface SignJsonData {
   [key: string]: any;
@@ -224,4 +225,10 @@ export function arrayToTree(
     }
   }
   return result;
+}
+
+export function getAbsolutePath(relativePath: string): string {
+  // return path.resolve(relativePath);
+
+  return path.join(__dirname, relativePath);
 }

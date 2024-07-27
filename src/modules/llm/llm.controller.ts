@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 13:54:37
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 14:49:18
+ * @LastEditTime: 2024-07-27 11:19:09
  * @FilePath: /one-llm-api/src/modules/llm/llm.controller.ts
  * @Description:
  *
@@ -91,5 +91,10 @@ export class LlmController {
         res.end();
       },
     });
+  }
+
+  @Post('file-loader')
+  async fileLoad(@Body() body: any) {
+    return await this.llmService.fileLoader();
   }
 }
