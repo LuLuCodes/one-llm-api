@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-25 18:54:18
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 14:15:30
+ * @LastEditTime: 2024-07-31 21:00:50
  * @FilePath: /one-llm-api/src/llm-models/zhipu.ts
  * @Description:
  *
@@ -23,7 +23,6 @@ export class ZhipuAI extends ChatModel {
 
   async invoke({
     temperature = 0.95,
-    topP = 0.7,
     maxTokens = 1024,
     messages,
   }: {
@@ -35,7 +34,6 @@ export class ZhipuAI extends ChatModel {
     const glm = new ChatZhipuAI({
       model: this.modelName,
       temperature,
-      topP,
       maxTokens,
       streaming: false,
       zhipuAIApiKey: this.apiKey,
@@ -46,7 +44,6 @@ export class ZhipuAI extends ChatModel {
 
   async stream({
     temperature = 0.95,
-    topP = 0.7,
     maxTokens = 1024,
     messages,
   }: {
@@ -58,7 +55,6 @@ export class ZhipuAI extends ChatModel {
     const glm = new ChatZhipuAI({
       model: this.modelName,
       temperature,
-      topP,
       maxTokens,
       streaming: true,
       zhipuAIApiKey: this.apiKey,

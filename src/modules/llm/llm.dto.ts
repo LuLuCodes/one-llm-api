@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 13:59:06
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 14:09:23
+ * @LastEditTime: 2024-07-31 19:38:16
  * @FilePath: /one-llm-api/src/modules/llm/llm.dto.ts
  * @Description:
  *
@@ -23,8 +23,8 @@ import {
 } from 'class-validator';
 
 export class ChatDTO {
-  @IsString({ message: 'input必须是字符串' })
-  @IsNotEmpty({ message: 'input是必填项' })
+  @IsString({ message: 'userInput必须是字符串' })
+  @IsNotEmpty({ message: 'userInput是必填项' })
   readonly userInput: string;
 
   // modelType必须是'zhipu'、'moonshot'
@@ -79,4 +79,8 @@ export class ChatDTO {
   @IsOptional()
   @IsString({ message: 'imageBase64必须是字符串' })
   readonly imageBase64?: string;
+
+  @IsOptional()
+  @IsString({ message: 'fileContent必须是字符串' })
+  readonly fileContent?: string;
 }

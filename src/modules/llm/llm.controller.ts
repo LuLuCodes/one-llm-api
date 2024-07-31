@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 13:54:37
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-27 11:19:09
+ * @LastEditTime: 2024-07-31 21:36:42
  * @FilePath: /one-llm-api/src/modules/llm/llm.controller.ts
  * @Description:
  *
@@ -17,8 +17,14 @@ import {
   Param,
   Res,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { Response } from 'express';
+import * as path from 'path';
+import { ensureDir, outputFile } from 'fs-extra';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@pipe/validation.pipe';
 import { LlmService } from './llm.service';
 
@@ -26,11 +32,14 @@ import { ChatDTO } from './llm.dto';
 
 @Controller('llm')
 export class LlmController {
-  constructor(private readonly llmService: LlmService) {}
+  constructor(
+    private configService: ConfigService,
+    private readonly llmService: LlmService,
+  ) {}
 
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post('chat/:convertionId?')
-  async loginByAccount(
+  async chat(
     @Param('convertionId') convertionId: string,
     @Body() body: ChatDTO,
     @Session() session,
@@ -45,13 +54,15 @@ export class LlmController {
       temperature: body.temperature,
       topP: body.topP,
       maxTokens: body.maxTokens,
+      fileContent: body.fileContent,
     });
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post('chat-stream/:convertionId?')
-  async streamResponse(
+  async chatStream(
     @Param('convertionId') convertionId: string,
+    @UploadedFile() file: Express.Multer.File,
     @Body() body: ChatDTO,
     @Session() session,
     @Res() res: Response,
@@ -72,6 +83,7 @@ export class LlmController {
       temperature: body.temperature,
       topP: body.topP,
       maxTokens: body.maxTokens,
+      fileContent: body.fileContent,
     });
 
     stream.subscribe({
@@ -94,7 +106,34 @@ export class LlmController {
   }
 
   @Post('file-loader')
-  async fileLoad(@Body() body: any) {
-    return await this.llmService.fileLoader();
+  @UseInterceptors(FileInterceptor('file'))
+  async fileLoader(
+    @UploadedFile() file: Express.Multer.File,
+    @Session() session,
+  ): Promise<any> {
+    const rootDir = process.cwd();
+    const uploadDir = this.configService.get<string>('app.upload_dir');
+    const folderPath = path.resolve(rootDir, uploadDir);
+    await ensureDir(folderPath);
+    const filePath = `${folderPath}/${file.originalname}`;
+    await outputFile(filePath, file.buffer);
+
+    return await this.llmService.fileLoader(file);
+  }
+
+  @Post('file-loader-by-moonshot')
+  @UseInterceptors(FileInterceptor('file'))
+  async fileLoaderByMoonShot(
+    @UploadedFile() file: Express.Multer.File,
+    @Session() session,
+  ): Promise<any> {
+    const rootDir = process.cwd();
+    const uploadDir = this.configService.get<string>('app.upload_dir');
+    const folderPath = path.resolve(rootDir, uploadDir);
+    await ensureDir(folderPath);
+    const filePath = `${folderPath}/${file.originalname}`;
+    await outputFile(filePath, file.buffer);
+
+    return await this.llmService.fileLoaderByMoonShot(file);
   }
 }

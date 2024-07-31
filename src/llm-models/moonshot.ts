@@ -2,8 +2,8 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-25 18:54:18
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 14:15:30
- * @FilePath: /one-llm-api/src/llm-models/zhipu.ts
+ * @LastEditTime: 2024-07-31 21:00:14
+ * @FilePath: /one-llm-api/src/llm-models/moonshot.ts
  * @Description:
  *
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
@@ -22,8 +22,7 @@ export class MoonshotAI extends ChatModel {
   }
 
   async invoke({
-    temperature = 0,
-    topP = 1,
+    temperature = 0.3,
     maxTokens = 2048,
     messages,
   }: {
@@ -35,7 +34,6 @@ export class MoonshotAI extends ChatModel {
     const moonshot = new ChatMoonshot({
       model: this.modelName,
       temperature,
-      topP,
       maxTokens,
       streaming: false,
       apiKey: this.apiKey,
@@ -45,8 +43,7 @@ export class MoonshotAI extends ChatModel {
   }
 
   async stream({
-    temperature = 0,
-    topP = 1,
+    temperature = 0.3,
     maxTokens = 2048,
     messages,
   }: {
@@ -58,7 +55,6 @@ export class MoonshotAI extends ChatModel {
     const moonshot = new ChatMoonshot({
       model: this.modelName,
       temperature,
-      topP,
       maxTokens,
       streaming: false,
       apiKey: this.apiKey,

@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-06-25 20:52:38
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-25 16:43:51
+ * @LastEditTime: 2024-07-31 16:27:39
  * @FilePath: /one-llm-api/src/main.ts
  * @Description:
  *
@@ -22,7 +22,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import bodyParserXml from 'body-parser-xml';
 import compression from 'compression';
-import multer from 'multer';
+import * as express from 'express';
 
 bodyParserXml(bodyParser);
 
@@ -49,8 +49,9 @@ async function bootstrap() {
     credentials: true,
   });
   app.use(compression());
-  app.use(multer().any());
   app.use(bodyParser.json({ limit: '50mb' })); // For parsing application/json
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   app.use(
     bodyParser.urlencoded({
       limit: '50mb',

@@ -3,6 +3,7 @@
 /uploads-temp
 /node_modules
 /oss-files
+/uploads
 .env
 
 # Logs

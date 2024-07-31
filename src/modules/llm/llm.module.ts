@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 10:02:42
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-26 14:01:31
+ * @LastEditTime: 2024-07-31 16:25:32
  * @FilePath: /one-llm-api/src/modules/llm/llm.module.ts
  * @Description:
  *
@@ -13,9 +13,15 @@ import { LlmController } from './llm.controller';
 import { LlmService } from './llm.service';
 import { ModelFactory } from '@llm-models/model-factory';
 import { ConvertionStoreService } from '@service/convertion-store.service';
+import { FileUploadService } from '@service/file-loader.service';
 
 @Module({
   controllers: [LlmController],
-  providers: [LlmService, ModelFactory, ConvertionStoreService],
+  providers: [
+    LlmService,
+    ModelFactory,
+    ConvertionStoreService,
+    FileUploadService,
+  ],
 })
 export class LlmModule {}

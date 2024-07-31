@@ -2,7 +2,7 @@
  * @Author: leyi leyi@myun.info
  * @Date: 2024-07-26 10:06:03
  * @LastEditors: leyi leyi@myun.info
- * @LastEditTime: 2024-07-27 14:37:57
+ * @LastEditTime: 2024-07-31 21:36:11
  * @FilePath: /one-llm-api/src/modules/llm/llm.service.ts
  * @Description:
  *
@@ -14,20 +14,24 @@ import {
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
-import { DocxLoader } from '@langchain/community/document_loaders/fs/docx';
 import { ModelFactory } from '@llm-models/model-factory';
 import { ChatModel } from '@llm-models/base';
 import { ConvertionStoreService } from '@service/convertion-store.service';
+import { ConfigService } from '@nestjs/config';
+import * as path from 'path';
+import { FileUploadService } from '@service/file-loader.service';
+import { pathExists, unlinkSync, createReadStream } from 'fs-extra';
 import { Observable } from 'rxjs';
-
+import OpenAI from 'openai';
 import { uuid } from '@libs/cryptogram';
-import { getAbsolutePath } from '@libs/util';
 
 @Injectable()
 export class LlmService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly modelFactory: ModelFactory,
     private readonly convertionStoreService: ConvertionStoreService,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   async processBlockResponse({
@@ -40,6 +44,7 @@ export class LlmService {
     temperature,
     topP,
     maxTokens,
+    fileContent,
   }: {
     convertionId: string;
     systemPrompt?: string;
@@ -50,6 +55,7 @@ export class LlmService {
     temperature?: number;
     topP?: number;
     maxTokens?: number;
+    fileContent?: string;
   }): Promise<any> {
     const model: ChatModel = this.modelFactory.createModel({
       modelType,
@@ -68,26 +74,39 @@ export class LlmService {
 
     const messages =
       !convertionId && systemPrompt ? [new SystemMessage(systemPrompt)] : [];
-    const userMessage: HumanMessage = new HumanMessage({
-      content: imageBase64
-        ? [
-            { type: 'text', text: userInput },
-            {
-              type: 'image_url',
-              image_url: {
-                url: imageBase64,
-              },
+
+    if (histroyMessages && histroyMessages.length > 0) {
+      messages.push(...histroyMessages);
+    }
+    if (fileContent) {
+      const fileMessage: SystemMessage = new SystemMessage(fileContent);
+      messages.push(fileMessage);
+    }
+
+    let userMessage: HumanMessage = null;
+    if (imageBase64) {
+      userMessage = new HumanMessage({
+        content: [
+          { type: 'text', text: userInput },
+          {
+            type: 'image_url',
+            image_url: {
+              url: imageBase64,
             },
-          ]
-        : [{ type: 'text', text: userInput }],
-    });
-    messages.push(...histroyMessages, userMessage);
+          },
+        ],
+      });
+    } else {
+      userMessage = new HumanMessage(userInput);
+    }
+    messages.push(userMessage);
     const res = await model.invoke({
       temperature,
       topP,
       maxTokens,
       messages,
     });
+    console.log(res);
 
     const newConversionId = convertionId || uuid();
 
@@ -112,6 +131,7 @@ export class LlmService {
     temperature,
     topP,
     maxTokens,
+    fileContent,
   }: {
     convertionId: string;
     systemPrompt?: string;
@@ -122,6 +142,7 @@ export class LlmService {
     temperature?: number;
     topP?: number;
     maxTokens?: number;
+    fileContent?: string;
   }): Observable<string> {
     return new Observable<string>((observer) => {
       (async () => {
@@ -145,15 +166,32 @@ export class LlmService {
             !convertionId && systemPrompt
               ? [new SystemMessage(systemPrompt)]
               : [];
-          const userMessage: HumanMessage = new HumanMessage({
-            content: imageBase64
-              ? [
-                  { type: 'text', text: userInput },
-                  { type: 'image_url', image_url: imageBase64 },
-                ]
-              : [{ type: 'text', text: userInput }],
-          });
-          messages.push(...histroyMessages, userMessage);
+
+          if (histroyMessages && histroyMessages.length > 0) {
+            messages.push(...histroyMessages);
+          }
+          if (fileContent) {
+            const fileMessage: SystemMessage = new SystemMessage(fileContent);
+            messages.push(fileMessage);
+          }
+
+          let userMessage: HumanMessage = null;
+          if (imageBase64) {
+            userMessage = new HumanMessage({
+              content: [
+                { type: 'text', text: userInput },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: imageBase64,
+                  },
+                },
+              ],
+            });
+          } else {
+            userMessage = new HumanMessage(userInput);
+          }
+          messages.push(userMessage);
 
           const stream = await model.stream({
             temperature,
@@ -187,15 +225,45 @@ export class LlmService {
     });
   }
 
-  async fileLoader() {
-    // 根据相对路径获取文件绝对路径
+  async fileLoader(file: Express.Multer.File) {
+    const { docs } = await this.fileUploadService.processFile(file);
+    console.log(docs[0]);
+    return docs.map((doc) => doc.pageContent).join('\n');
+  }
 
-    const filePath = getAbsolutePath('../../20240711.docx');
-    console.log(filePath);
-    const loader = new DocxLoader(filePath);
+  async fileLoaderByMoonShot(file: Express.Multer.File) {
+    const rootDir = process.cwd();
+    const uploadDir = this.configService.get<string>('app.upload_dir');
+    const moonShotApiKey = this.configService.get<string>(
+      'llm.moonshot_api_key',
+    );
+    const folderPath = path.resolve(rootDir, uploadDir);
+    const filePath = `${folderPath}/${file.originalname}`;
+    try {
+      const exists = await pathExists(filePath);
+      if (!exists) {
+        throw new Error(`File not found: ${filePath}`);
+      }
+      const client = new OpenAI({
+        apiKey: moonShotApiKey,
+        baseURL: 'https://api.moonshot.cn/v1',
+      });
+      const file_object = await client.files.create({
+        file: createReadStream(filePath),
+        purpose: 'file-extract' as any,
+      });
 
-    const docs = await loader.load();
+      const file_content = await (
+        await client.files.content(file_object.id)
+      ).text();
 
-    console.log(docs);
+      return file_content;
+    } catch (error) {
+      console.error(`Error processing file ${file.originalname}:`, error);
+      throw error;
+    } finally {
+      // Clean up the uploaded file
+      unlinkSync(filePath);
+    }
   }
 }

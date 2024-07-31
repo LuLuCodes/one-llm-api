@@ -22,6 +22,7 @@ import { InitModule } from './init.module';
 import { LlmModule } from '@modules/llm/llm.module';
 
 import { ConvertionStoreService } from '@service/convertion-store.service';
+import { FileUploadService } from '@service/file-loader.service';
 
 import app_config from '@config/app';
 import redis_config from '@config/redis';
@@ -54,6 +55,7 @@ import llm from '@config/llm';
     //   useClass: SignGuard,
     // },
     ConvertionStoreService,
+    FileUploadService,
   ],
 })
 export class AppModule implements NestModule {

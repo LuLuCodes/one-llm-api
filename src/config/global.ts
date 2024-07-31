@@ -4,9 +4,9 @@
  * @LastEditors: leyi leyi@myun.info
  * @LastEditTime: 2024-07-25 15:30:59
  * @FilePath: /one-llm-api/src/config/global.ts
- * @Description: 
- * 
- * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
+ * @Description:
+ *
+ * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
  */
 export enum ResponseCode {
   OK = 0,
