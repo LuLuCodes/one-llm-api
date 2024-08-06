@@ -1,6 +1,15 @@
+/*
+ * @Author: leyi leyi@myun.info
+ * @Date: 2024-06-25 20:52:38
+ * @LastEditors: leyi leyi@myun.info
+ * @LastEditTime: 2024-08-06 10:55:13
+ * @FilePath: /one-llm-api/src/libs/util.ts
+ * @Description:
+ *
+ * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved.
+ */
 import { ResponseCode } from '@config/global';
 import * as path from 'path';
-
 interface SignJsonData {
   [key: string]: any;
 }
