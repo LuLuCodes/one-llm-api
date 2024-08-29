@@ -32,6 +32,7 @@
     "@langchain/cohere": "^0.2.1",
     "@langchain/community": "^0.2.20",
     "@langchain/core": "^0.2.18",
+    "@langchain/openai": "^0.2.8",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.3.5",
     "@nestjs/config": "^3.2.1",
